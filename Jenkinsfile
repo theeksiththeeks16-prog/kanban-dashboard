@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Deploy') {
             steps {
                 sh '''
                     docker stop kanban-dashboard || true
