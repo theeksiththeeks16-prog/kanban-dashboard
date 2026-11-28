@@ -1,74 +1,139 @@
-# React + TypeScript + Vite
+# Docker CI/CD Pipeline with Jenkins on AWS EC2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
 
-Currently, two official plugins are available:
+This project demonstrates an automated CI/CD pipeline to build, push, and deploy a web application using GitHub, Jenkins, Docker, Docker Hub, and AWS EC2.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Whenever code is pushed to GitHub, the configured webhook triggers Jenkins to automatically execute the pipeline, build a Docker image, push it to Docker Hub, deploy it to the EC2 instance, and validate the deployment.
 
-## React Compiler
+## Architecture
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**GitHub → GitHub Webhook → Jenkins → Docker Build → Docker Hub → AWS EC2 → Container Deployment → Validation**
 
-## Expanding the ESLint configuration
+## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **GitHub** – Source code management
+- **GitHub Webhooks** – Automatic pipeline triggering on code pushes
+- **Jenkins** – CI/CD automation
+- **Docker** – Containerization
+- **Docker Hub** – Docker image registry
+- **AWS EC2** – Cloud deployment server
+- **Linux (Amazon Linux)** – Server operating system
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## CI/CD Pipeline Stages
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Checkout** – Fetch source code from the GitHub repository.
+2. **Build Docker Image** – Build the application Docker image.
+3. **Push to Docker Hub** – Upload the image to Docker Hub.
+4. **Deploy** – Deploy the latest application image to the EC2 server.
+5. **Verify Deployment** – Verify that the deployed application is running.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Automated Workflow
+
+1. Developer pushes code to GitHub.
+2. GitHub webhook sends a push event to Jenkins.
+3. Jenkins automatically starts the pipeline.
+4. Jenkins checks out the latest source code.
+5. Docker image is built and tagged.
+6. The image is pushed to Docker Hub.
+7. The application container is deployed on AWS EC2.
+8. Deployment is validated.
+
+## Docker Image
+
+**Docker Hub Repository:**  
+https://hub.docker.com/r/theeksith/kanban-dashboard
+
+Image naming format:
+
+```text
+theeksith/kanban-dashboard:<build-number>
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The pipeline also updates the `latest` tag.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Deployment Details
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Configuration | Value |
+|---|---|
+| Cloud platform | AWS EC2 |
+| Application container | kanban-dashboard |
+| Docker image | theeksith/kanban-dashboard |
+| Container port | 8080 |
+| Host port | 8081 |
+| Deployment method | Jenkins automated pipeline |
+| Container health | Docker health check |
+
+The application is accessible through:
+
+```text
+http://<EC2-PUBLIC-IP>:8081
 ```
-CI/CD webhook test
+
+## Docker Resource Limits
+
+CPU and memory limits are configured for the deployed application container.
+
+| Resource | Limit |
+|---|---|
+| Memory | 512 MB |
+| Memory + Swap | 768 MB |
+| CPU | 0.5 CPU |
+
+These limits help prevent the container from consuming excessive server resources.
+
+## Monitoring and Logs
+
+Docker container logs can be checked using:
+
+```bash
+sudo docker logs --tail 20 kanban-dashboard
+```
+
+Container resource usage can be monitored using:
+
+```bash
+sudo docker stats --no-stream kanban-dashboard
+```
+
+Container status can be checked using:
+
+```bash
+sudo docker ps
+```
+
+## GitHub Webhook
+
+A GitHub webhook is configured to trigger the Jenkins pipeline automatically whenever code is pushed to the repository.
+
+**Webhook event:** Push
+
+**Jenkins trigger:** GitHub hook trigger for GITScm polling
+
+The webhook integration was tested successfully, and Jenkins Build #5 was automatically triggered by a GitHub push and completed successfully.
+
+## Project Validation
+
+The following validations were performed:
+
+- Jenkins pipeline completed successfully.
+- Docker image was built successfully.
+- Docker image was pushed to Docker Hub.
+- Application was deployed on AWS EC2.
+- Application was accessible through the configured port.
+- Docker container health status was verified.
+- GitHub webhook automatically triggered Jenkins.
+- CPU and memory limits were applied and verified.
+- Docker logs and resource usage were checked.
+
+## Repository
+
+GitHub Repository:
+
+https://github.com/theeksiththeeks16-prog/kanban-dashboard
+
+## Author
+
+**Theeksith S.**
+
+DevOps Project – Automated CI/CD Deployment using Jenkins, Docker, and AWS EC2
