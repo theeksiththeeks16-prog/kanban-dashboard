@@ -41,17 +41,20 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Verify Deployment') {
             steps {
                 sh '''
                     docker stop kanban-dashboard || true
                     docker rm kanban-dashboard || true
 
                     docker run -d \
-                        --name kanban-dashboard \
-                        --restart unless-stopped \
-                        -p 8081:8080 \
-                        ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                         --name kanban-dashboard \
+                         --restart unless-stopped \
+                         --memory=512m \
+                         --memory-swap=768m \
+                         --cpus=0.50 \
+                         -p 8081:8080 \
+                         ${DOCKER_IMAGE}:${BUILD_NUMBER}
                 '''
             }
         }
